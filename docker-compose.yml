@@ -13,15 +13,21 @@ services:
     depends_on:
       - mongo
     restart: always
+    volumes:
+      - ./backend:/app:rw,cached
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      target: dev
     ports:
       - "8080:80"
     networks:
       - app-network
     depends_on:
       - backend
+    volumes:
+      - ./frontend:/app:rw,cached
 
   mongo:
     image: mongo:6.0
