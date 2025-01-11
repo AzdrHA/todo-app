@@ -16,7 +16,11 @@ const TodoSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
-    }
+    },
+    tags: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Tag'
+    }],
 });
 
 module.exports = mongoose.model('Todo', TodoSchema);

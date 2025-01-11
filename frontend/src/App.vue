@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import TodoList from './components/TodoList.vue';
+import TodoList from './components/todo/TodoList.vue';
 
 export default {
   name: 'App',
@@ -17,7 +17,3 @@ export default {
   }
 };
 </script>
-
-<style>
-/* Vous pouvez ajouter des styles supplémentaires ici si nécessaire */
-</style>
