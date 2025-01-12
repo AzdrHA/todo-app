@@ -25,16 +25,15 @@
             'line-through text-gray-500': todoData.completed,
             'text-gray-900': !todoData.completed
           }"
-          class="ml-2"
+          class="mx-2"
         > {{ todoData.title }} </span>
 
-        <ul class="mt-1 *:mx-1 *:rounded-full *:px-2 *:py-0.5 flex">
+        <ul class="mx-2 mt-1 *:rounded-full *:px-2 *:py-0.5 flex flex-wrap text-sm gap-y-1 gap-x-1">
           <li v-for="tag in todoData.tags" :key="tag._id" :style="liStyle(tag.color)" class="border">
             {{ tag.title }}
           </li>
         </ul>
       </div>
-
     </div>
     <div class="flex items-center">
       <tag-dropdown :todo-id="todo._id" :todo-tags="todo.tags" @tag-added="tagAdded" @tag-removed="removeTag" />
@@ -86,8 +85,8 @@ export default {
     },
     liStyle(color) {
       return {
-        backgroundColor: hexToRgba(color, 0.2),
-        borderColor: hexToRgba(color, 0.3),
+        backgroundColor: hexToRgba(color, .2),
+        borderColor: hexToRgba(color, .1),
         color
       };
     },

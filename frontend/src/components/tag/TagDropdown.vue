@@ -14,7 +14,7 @@
     <div v-if="isOpen" class="absolute right-0 mt-2 p-3 w-72 bg-white shadow-md rounded-lg z-10 border border-gray-200">
       <form class="flex items-center justify-between mb-3" @submit.prevent="submit">
         <input
-          v-model="title"
+          v-model="tag.title"
           type="text"
           name="title"
           placeholder="Nouveau tag"
@@ -23,7 +23,7 @@
         />
 
         <input
-          v-model="color"
+          v-model="tag.color"
           type="color"
           class="mx-2 w-8 h-8 rounded cursor-pointer"
           required
@@ -75,9 +75,7 @@ export default {
   emits: ['tagAdded', 'tagRemoved'],
   data() {
     return {
-      isOpen: false,
-      title: '',
-      color: ''
+      isOpen: false
     }
   },
   computed: {
@@ -91,16 +89,14 @@ export default {
     }
 
     document.addEventListener('keydown', handleEscape)
-    // this.$once('hook:beforeDestroy', () => {
-    //   document.removeEventListener('keydown', handleEscape)
-    // })
   },
   methods: {
     submit() {
       this.isOpen = false
 
-      createTagRequest(this.title, this.color, this.todoId).then((tag) => {
+      createTagRequest(this.tag.title, this.tag.color, this.todoId).then((tag) => {
         this.$emit('tagAdded', tag)
+        this.$store.commit('addTag', tag)
       })
     },
     actionTag(tag) {
