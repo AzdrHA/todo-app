@@ -18,44 +18,60 @@
         height="20"
         @change="updateTodo(todo)"
       />
-      <span
-        :class="{
+
+      <div class="flex flex-col">
+        <span
+          :class="{
             'line-through text-gray-500': todoData.completed,
             'text-gray-900': !todoData.completed
           }"
-        class="ml-2"
-      > {{ todoData.title }} </span>
+          class="ml-2"
+        > {{ todoData.title }} </span>
+
+        <ul class="mt-1 *:mx-1 *:rounded-full *:px-2 *:py-0.5 flex">
+          <li v-for="tag in todoData.tags" :key="tag._id" :style="liStyle(tag.color)" class="border">
+            {{ tag.title }}
+          </li>
+        </ul>
+      </div>
+
     </div>
-    <button
-      class="text-red-500 hover:text-red-700 focus:outline-none"
-      @click="deleteTodo(todo._id)"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-        viewBox="0 0 24 24" stroke="currentColor">
-        <path
-          stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M6 18L18 6M6 6l12 12" />
-      </svg>
-    </button>
+    <div class="flex items-center">
+      <tag-dropdown :todo-id="todo._id" :todo-tags="todo.tags" @tag-added="tagAdded" @tag-removed="removeTag" />
+      <button
+        class="text-red-500 hover:text-red-700 focus:outline-none"
+        @click="deleteTodo(todo._id)"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor">
+          <path
+            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
   </li>
 </template>
 
 <script>
+
+import TagDropdown from "../tag/TagDropdown.vue";
+import { hexToRgba } from "../../utils/ColorUtil";
+
 export default {
   name: "TodoListItem",
+  components: { TagDropdown },
   props: {
     todo: {
       type: Object,
       required: true
     }
   },
+  emits: ["updateTodo", "deleteTodo"],
   data() {
     return {
-      todoData: {
-        title: "test",
-        completed: false
-      }
+      todoData: {}
     };
   },
   mounted() {
@@ -67,6 +83,19 @@ export default {
     },
     async deleteTodo(id) {
       this.$emit("deleteTodo", id);
+    },
+    liStyle(color) {
+      return {
+        backgroundColor: hexToRgba(color, 0.2),
+        borderColor: hexToRgba(color, 0.3),
+        color
+      };
+    },
+    tagAdded(tag) {
+      this.todoData.tags.push(tag);
+    },
+    removeTag(tagE) {
+      this.todoData.tags = this.todoData.tags.filter((tag) => tag._id !== tagE._id);
     }
   }
 };

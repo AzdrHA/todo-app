@@ -7,7 +7,7 @@ const Todo = require('../models/Todo');
 // GET all todos
 router.get('/', async (req, res) => {
     try {
-        const todos = await Todo.find().sort('position').exec();
+        const todos = await Todo.find().populate('tags').sort('position').exec();
         res.json(todos);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -91,6 +91,23 @@ router.put('/reorder', async (req, res) => {
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
+});
+
+router.post('/:id/:tagId', getTodo, async (req, res) => {
+    const todo = await Todo.findById(res.todo);
+    todo.tags.push(req.params.tagId);
+    await todo.save();
+
+    res.json(res.todo);
+});
+
+router.delete('/:id/:tagId', getTodo, async (req, res) => {
+    const todo = await Todo.findById(res.todo);
+    console.log(todo.tags);
+    todo.tags = todo.tags.filter((tag) => tag._id.toString() !== req.params.tagId);
+    await todo.save();
+
+    res.json(res.todo);
 });
 
 // Middleware to get todo by ID

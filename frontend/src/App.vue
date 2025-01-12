@@ -9,11 +9,17 @@
 
 <script>
 import TodoList from './components/todo/TodoList.vue';
+import axios from "axios";
 
 export default {
   name: 'App',
   components: {
     TodoList
+  },
+  created() {
+    axios.get('api/tags').then(res => {
+      this.$store.commit('setTags', res.data)
+    });
   }
 };
 </script>

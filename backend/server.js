@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const todoRoutes = require('./routes/todos');
+const tagRoutes = require('./routes/tags');
 const net = require('net');
 
 const app = express();
@@ -34,6 +35,7 @@ const startServer = async () => {
   app.use(cors());
   app.use(bodyParser.json());
   app.use('/api/todos', todoRoutes);
+  app.use('/api/tags', tagRoutes);
 
   try {
     await mongoose.connect(MONGO_URI, {

@@ -17,7 +17,7 @@
 
     <div ref="sortableList" class="space-y-2">
       <transition-group>
-        <TodoListItem v-for="todo in todos" :key="todo._id" :todo="todo" @delete-todo="deleteTodo" @update-todo="updateTodo"/>
+        <todo-list-item v-for="todo in todos" :key="todo._id" :todo="todo" @delete-todo="deleteTodo" @update-todo="updateTodo"/>
       </transition-group>
     </div>
   </div>
@@ -45,7 +45,6 @@ export default {
   },
   mounted() {
     this.fetchTodos();
-    // Initialiser Sortable
     Sortable.create(this.$refs.sortableList, {
       handle: '.handle',
       animation: 150,
@@ -94,10 +93,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-.handle {
-  display: flex;
-  align-items: center;
-}
-</style>
