@@ -16,6 +16,6 @@ export const addTodoRequest = async (title) => {
   return makeRequest({url: '/api/todos', method: 'POST', data: {title}})
 }
 
-export const getAllTodoRequest = async () => {
-  return makeRequest({url: '/api/todos', method: 'GET'})
+export const searchTodo = async (filter) => {
+  return makeRequest({url: `/api/todos/search?title=${filter.title}&completed=${filter.completed}`, method: 'GET'})
 }

@@ -15,9 +15,10 @@
       </button>
     </form>
 
+    <div v-if="todo.todos.length === 0" class="text-center text-gray-500">Aucune tâche à afficher</div>
     <div ref="sortableList" class="space-y-2">
       <transition-group>
-        <todo-list-item v-for="todo in todos" :key="todo._id" :todo="todo" @delete-todo="deleteTodo" @update-todo="updateTodo"/>
+        <todo-list-item v-for="todo in todo.todos" :key="todo._id" :todo="todo" @delete-todo="deleteTodo" @update-todo="updateTodo"/>
       </transition-group>
     </div>
   </div>
@@ -28,23 +29,27 @@ import Sortable from 'sortablejs';
 import TodoListItem from "./TodoListItem.vue";
 import {
   addTodoRequest,
-  deleteTodoRequest,
-  getAllTodoRequest,
   reorderTodoRequest,
   updateTodoRequest
 } from "../../api/totoRequest";
+import { mapState } from 'vuex';
 
 export default {
   name: 'TodoList',
   components: {TodoListItem},
   data() {
     return {
-      todos: [],
       newTodo: '',
+      loading: true,
+      color: '#FF0000',
+      size: '54px'
     };
   },
+  computed: {
+    ...mapState(['todo'])
+  },
   mounted() {
-    this.fetchTodos();
+    this.$store.dispatch('fetchTodos', this.todo.filter);
     Sortable.create(this.$refs.sortableList, {
       handle: '.handle',
       animation: 150,
@@ -52,17 +57,10 @@ export default {
     });
   },
   methods: {
-    async fetchTodos() {
-      try {
-        this.todos = await getAllTodoRequest();
-      } catch (error) {
-        console.error(error);
-      }
-    },
     async addTodo() {
       if (this.newTodo.trim() === '') return;
       try {
-        this.todos.push(await addTodoRequest(this.newTodo));
+        this.todo.todos.push(await addTodoRequest(this.newTodo));
         this.newTodo = '';
       } catch (error) {
         console.error(error);
@@ -70,7 +68,7 @@ export default {
     },
     async onDragEnd() {
       try {
-        await reorderTodoRequest(this.todos)
+        await reorderTodoRequest(this.todo.todos)
       } catch (error) {
         console.error('Error updating order:', error);
       }
@@ -84,8 +82,7 @@ export default {
     },
     async deleteTodo(id) {
       try {
-        await deleteTodoRequest(id)
-        this.todos = this.todos.filter((todo) => todo._id !== id)
+        this.$store.dispatch('removeTodoById', id);
       } catch (error) {
         console.error(error);
       }

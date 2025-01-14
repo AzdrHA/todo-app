@@ -1,15 +1,15 @@
 <template>
   <li class="flex items-center justify-between p-2 bg-gray-50 rounded-md shadow-sm">
     <div class="flex items-center">
-            <span class="handle cursor-move mr-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none"
-                viewBox="0 0 24 24" stroke="currentColor">
-                <path
-                  stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M4 8h16M4 16h16" />
-              </svg>
-            </span>
+      <span class="handle cursor-move mr-2">
+        <svg
+          xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor">
+          <path
+            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 8h16M4 16h16" />
+        </svg>
+      </span>
       <input
         v-model="todoData.completed"
         type="checkbox"
@@ -78,7 +78,7 @@ export default {
   },
   methods: {
     async updateTodo(todo) {
-      this.$emit("updateTodo", todo._id, todo.completed);
+      this.$emit("updateTodo", todo._id, this.todoData.completed);
     },
     async deleteTodo(id) {
       this.$emit("deleteTodo", id);

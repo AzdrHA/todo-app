@@ -1,5 +1,7 @@
 import Todo from '../models/Todo';
-import mongoose from 'mongoose';
+import { ISearchParams } from '../interfaces/ISearchParams';
+import Tag from '../models/Tag';
+import { ISearchCondition } from '../interfaces/ISearchCondition';
 
 class TodoService {
   public async getAll() {
@@ -45,8 +47,10 @@ class TodoService {
 
   public async addTagToTodo(todoId: string, tagId: string) {
     const todo = await Todo.findById(todoId);
+    const tag = await Tag.findById(tagId);
     if (!todo) throw new Error('Todo not found');
-    todo.tags.push(new mongoose.Types.ObjectId(tagId));
+    if (!tag) throw new Error('Tag not found');
+    todo.tags.push(tag);
     return todo.save();
   }
 
@@ -55,6 +59,21 @@ class TodoService {
     if (!todo) throw new Error('Todo not found');
     todo.tags = todo.tags.filter((tag) => tag.toString() !== tagId);
     return todo.save();
+  }
+
+  public async search(params: ISearchParams) {
+    const { title, completed } = params;
+
+    const searchConditions: ISearchCondition = { title: { $regex: title, $options: 'i' } };
+
+    if (completed !== undefined) {
+      if (completed === "all") {
+        return await Todo.find(searchConditions).populate('tags').exec();
+      }
+      searchConditions.completed = completed;
+    }
+
+    return await Todo.find(searchConditions).populate('tags').exec();
   }
 }
 

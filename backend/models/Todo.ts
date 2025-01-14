@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { ITodo } from '../interfaces/ITodo';
 
 const TodoSchema = new mongoose.Schema({
   title: {
@@ -23,4 +24,4 @@ const TodoSchema = new mongoose.Schema({
   }],
 });
 
-export default mongoose.model('Todo', TodoSchema);
+export default mongoose.model<ITodo>('Todo', TodoSchema);

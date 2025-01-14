@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { ITag } from '../interfaces/ITag';
 
 const TagSchema = new mongoose.Schema({
   title: {
@@ -12,4 +13,4 @@ const TagSchema = new mongoose.Schema({
   }
 });
 
-export default mongoose.model('Tag', TagSchema);
+export default mongoose.model<ITag>('Tag', TagSchema);
