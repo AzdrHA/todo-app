@@ -5,6 +5,7 @@ const todoStore = {
     filter: {
       title: '',
       completed: 'all',
+      priority: 'all',
       loading: false
     }
   },
@@ -18,6 +19,7 @@ const todoStore = {
   },
   actions: {
     async fetchTodos({ commit }, filter) {
+      // commit('setTodos', []);
       const todos = await searchTodo(filter)
       commit('setTodos', todos);
     },

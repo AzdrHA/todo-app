@@ -7,4 +7,5 @@ export interface ITodo extends Document {
   position: number;
   tags: ITag[];
   createdAt: Date;
+  priority: 'high' | 'medium' | 'low';
 }

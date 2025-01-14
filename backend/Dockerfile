@@ -1,5 +1,5 @@
 # Utiliser une image Node.js officielle comme image parent
-FROM node:18
+FROM node:22-alpine
 
 # Définir le répertoire de travail
 WORKDIR /app

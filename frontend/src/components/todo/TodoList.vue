@@ -31,7 +31,7 @@ import {
   addTodoRequest,
   reorderTodoRequest,
   updateTodoRequest
-} from "../../api/totoRequest";
+} from '../../api/totoRequest';
 import { mapState } from 'vuex';
 
 export default {
@@ -40,7 +40,6 @@ export default {
   data() {
     return {
       newTodo: '',
-      loading: true,
       color: '#FF0000',
       size: '54px'
     };
@@ -73,9 +72,9 @@ export default {
         console.error('Error updating order:', error);
       }
     },
-    async updateTodo(id, completed) {
+    async updateTodo(id, completed, priority) {
       try {
-        await updateTodoRequest(id, completed)
+        await updateTodoRequest(id, completed, priority)
       } catch (error) {
         console.error(error);
       }

@@ -1,5 +1,12 @@
 <template>
-  <li class="flex items-center justify-between p-2 bg-gray-50 rounded-md shadow-sm">
+  <li
+    class="flex items-center justify-between p-2 bg-gray-50 rounded-md shadow-sm"
+    :class="{
+    'border-l-4 border-red-500': todoData.priority === 'high',
+    'border-l-4 border-yellow-500': todoData.priority === 'medium',
+    'border-l-4 border-green-500': todoData.priority === 'low'
+  }"
+  >
     <div class="flex items-center">
       <span class="handle cursor-move mr-2">
         <svg
@@ -33,23 +40,68 @@
             {{ tag.title }}
           </li>
         </ul>
+
+
       </div>
     </div>
-    <div class="flex items-center">
-      <tag-dropdown :todo-id="todo._id" :todo-tags="todo.tags" @tag-added="tagAdded" @tag-removed="removeTag" />
-      <button
-        class="text-red-500 hover:text-red-700 focus:outline-none"
-        @click="deleteTodo(todo._id)"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-          viewBox="0 0 24 24" stroke="currentColor">
-          <path
-            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-    </div>
+    <div class="flex items-center flex-col">
+<!--      &lt;!&ndash; Priority badge &ndash;&gt;-->
+<!--      <span-->
+<!--        class="text-xs font-semibold px-2 py-1 rounded-md self-start mt-1"-->
+<!--        :class="{-->
+<!--          'bg-red-100 text-red-600': todoData.priority === 'high',-->
+<!--          'bg-yellow-100 text-yellow-600': todoData.priority === 'medium',-->
+<!--          'bg-green-100 text-green-600': todoData.priority === 'low'-->
+<!--        }"-->
+<!--      >-->
+<!--        {{todoData.priority}}-->
+<!--      </span>-->
+
+      <!-- Priority badge and selector -->
+      <div class="mt-2 relative flex flex-col">
+        <span
+          class="text-xs font-semibold px-2 py-1 rounded-md self-start cursor-pointer"
+          :class="{
+            'bg-red-100 text-red-600': todoData.priority === 'high',
+            'bg-yellow-100 text-yellow-600': todoData.priority === 'medium',
+            'bg-green-100 text-green-600': todoData.priority === 'low'
+          }"
+          @click="openPrioritySelect"
+        >
+          {{ todoData.priority }}
+        </span>
+
+        <!-- Select dropdown -->
+        <select
+          v-if="showPrioritySelect"
+          ref="prioritySelect"
+          v-model="todoData.priority"
+          class="absolute top-0 left-0 mt-7 h-12 w-36 text-sm border rounded px-2 py-1 bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 z-10"
+          @change="updatePriority(todo._id, todoData.priority)"
+          @blur="closePrioritySelect"
+        >
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
+      </div>
+
+      <div class="flex items-center">
+        <tag-dropdown :todo-id="todo._id" :todo-tags="todo.tags" @tag-added="tagAdded" @tag-removed="removeTag" />
+        <button
+          class="text-red-500 hover:text-red-700 focus:outline-none"
+          @click="deleteTodo(todo._id)"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      </div>
   </li>
 </template>
 
@@ -70,7 +122,8 @@ export default {
   emits: ["updateTodo", "deleteTodo"],
   data() {
     return {
-      todoData: {}
+      todoData: {},
+      showPrioritySelect: false
     };
   },
   mounted() {
@@ -78,7 +131,7 @@ export default {
   },
   methods: {
     async updateTodo(todo) {
-      this.$emit("updateTodo", todo._id, this.todoData.completed);
+      this.$emit("updateTodo", todo._id, this.todoData.completed, this.todoData.priority);
     },
     async deleteTodo(id) {
       this.$emit("deleteTodo", id);
@@ -95,7 +148,19 @@ export default {
     },
     removeTag(tagE) {
       this.todoData.tags = this.todoData.tags.filter((tag) => tag._id !== tagE._id);
-    }
+    },
+    openPrioritySelect() {
+      this.showPrioritySelect = true;
+      this.$nextTick(() => {
+        this.$refs.prioritySelect?.focus();
+      });
+    },
+    closePrioritySelect() {
+      this.showPrioritySelect = false;
+    },
+    async updatePriority(todoId, newPriority) {
+      this.$emit("updateTodo", todoId, this.todoData.completed, newPriority);
+    },
   }
 };
 </script>

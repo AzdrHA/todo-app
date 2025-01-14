@@ -22,6 +22,7 @@ const TodoSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Tag'
   }],
+  priority: { type: String, enum: ['high', 'medium', 'low'], default: 'medium' }
 });
 
 export default mongoose.model<ITodo>('Todo', TodoSchema);

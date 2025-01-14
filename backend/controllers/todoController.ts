@@ -33,7 +33,7 @@ class TodoController {
 
   public async patch(req: Request, res: Response): Promise<void> {
     try {
-      const updatedTodo = await TodoService.updateTodo(req.params.id, req.body.title, req.body.completed);
+      const updatedTodo = await TodoService.updateTodo(req.params.id, req.body.title, req.body.completed, req.body.priority);
       res.json(updatedTodo);
     } catch (error) {
       handleError(error, res);
@@ -76,24 +76,25 @@ class TodoController {
     }
   }
 
-
-
   public async search(req: Request, res: Response): Promise<void> {
     try {
-      const { title, completed } = req.query;
+      const { title, completed, priority } = req.query;
 
-      if (completed !== undefined && completed !== "true" && completed !== "false" && completed !== "all") {
-        res.status(400).json({ error: "Le paramètre 'completed' doit être 'true', 'false' ou 'all'." });
-        return;
+      const searchParams: ISearchParams = {};
+
+      if (title) {
+        searchParams.title = title as string;
       }
 
-      const searchParams: ISearchParams = {
-        title: title as string,
-        completed: completed !== undefined ? (completed === "true" ? true : completed === "false" ? false : "all") : undefined,
-      };
+      if (completed !== undefined && completed !== 'all') {
+        searchParams.completed = completed === 'true';
+      }
+
+      if (priority && priority !== 'all') {
+        searchParams.priority = priority as 'high' | 'medium' | 'low';
+      }
 
       const tasks = await TodoService.search(searchParams);
-
       res.status(200).json(tasks);
     } catch (error) {
       handleError(error, res);

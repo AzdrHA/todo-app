@@ -1,7 +1,7 @@
 import { makeRequest } from "./request";
 
-export const updateTodoRequest = async (id, completed) => {
-  return makeRequest({url: `/api/todos/${id}`, data: {completed}, method: "PATCH"})
+export const updateTodoRequest = async (id, completed, priority) => {
+  return makeRequest({url: `/api/todos/${id}`, data: {completed, priority}, method: "PATCH"})
 }
 
 export const deleteTodoRequest = async (id) => {
@@ -17,5 +17,5 @@ export const addTodoRequest = async (title) => {
 }
 
 export const searchTodo = async (filter) => {
-  return makeRequest({url: `/api/todos/search?title=${filter.title}&completed=${filter.completed}`, method: 'GET'})
+  return makeRequest({url: `/api/todos/search?title=${filter.title}&completed=${filter.completed}&priority=${filter.priority}`, method: 'GET'})
 }

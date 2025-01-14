@@ -1,5 +1,3 @@
-
-
 <template>
   <div class="flex mb-4">
     <input
@@ -15,6 +13,15 @@
       <option value="all">Tous</option>
       <option value="true">Terminés</option>
       <option value="false">Non terminés</option>
+    </select>
+    <select
+      v-model="todo.filter.priority"
+      class="border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+    >
+      <option value="all">Toutes les priorités</option>
+      <option value="high">Haute</option>
+      <option value="medium">Moyenne</option>
+      <option value="low">Basse</option>
     </select>
   </div>
 </template>
@@ -41,7 +48,7 @@ export default {
 
         this.debounceTimeout = setTimeout(() => {
           this.$store.dispatch('fetchTodos', this.todo.filter);
-        }, 500);
+        }, 200);
       },
       deep: true
     }

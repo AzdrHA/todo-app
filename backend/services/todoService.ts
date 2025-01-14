@@ -19,11 +19,12 @@ class TodoService {
     return todo.save();
   }
 
-  public async updateTodo(todoId: string, title?: string, completed?: boolean) {
+  public async updateTodo(todoId: string, title?: string, completed?: boolean, priority?: string) {
     const todo = await Todo.findById(todoId);
     if (!todo) throw new Error('Todo not found');
     if (title !== undefined) todo.title = title;
     if (completed !== undefined) todo.completed = completed;
+    if (priority !== undefined) todo.priority = priority;
     return todo.save();
   }
 
@@ -62,15 +63,28 @@ class TodoService {
   }
 
   public async search(params: ISearchParams) {
-    const { title, completed } = params;
+    const { title, completed, priority } = params;
 
-    const searchConditions: ISearchCondition = { title: { $regex: title, $options: 'i' } };
+    if (completed && !['true', 'false', 'all'].includes(completed.toString())) {
+      throw new Error("Invalid value for 'completed'. Expected 'true', 'false', or 'all'.");
+    }
 
-    if (completed !== undefined) {
-      if (completed === "all") {
-        return await Todo.find(searchConditions).populate('tags').exec();
-      }
+    if (priority && !['high', 'medium', 'low', 'all'].includes(priority)) {
+      throw new Error("Invalid value for 'priority'. Expected 'high', 'medium', 'low', or 'all'.");
+    }
+
+    const searchConditions: ISearchCondition = {};
+
+    if (title) {
+      searchConditions.title = { $regex: title, $options: 'i' };
+    }
+
+    if (completed !== undefined && completed !== "all") {
       searchConditions.completed = completed;
+    }
+
+    if (priority !== undefined && priority !== "all") {
+      searchConditions.priority = priority;
     }
 
     return await Todo.find(searchConditions).populate('tags').exec();
