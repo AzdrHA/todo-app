@@ -3,75 +3,133 @@ import { ISearchParams } from '../interfaces/ISearchParams';
 import Tag from '../models/Tag';
 import { ISearchCondition } from '../interfaces/ISearchCondition';
 import { ITodo } from '../interfaces/ITodo';
+import { ISearchResult } from '../interfaces/ISearchResult';
 
 class TodoService {
-  public async getTodoById(id: string) {
+  /**
+   * Récupère une tâche par son ID.
+   * @param {string} id - L'ID de la tâche à récupérer
+   * @returns {Promise<ITodo | null>} - La tâche ou null si non trouvée
+   */
+  public async getTodoById(id: string): Promise<ITodo | null> {
     return Todo.findById(id);
   }
 
-  public async create(title: string) {
+  /**
+   * Crée une nouvelle tâche.
+   * @param {string} title - Le titre de la tâche
+   * @returns {Promise<ISearchResult>} - Liste des tâches après création
+   */
+  public async create(title: string): Promise<ISearchResult> {
     const maxPositionTodo = await Todo.findOne().sort('-position').exec();
     const newPosition = maxPositionTodo ? maxPositionTodo.position + 1 : 1;
+
     const todo = new Todo({ title, position: newPosition });
     await todo.save();
 
-    return this.search({page: 1})
+    return this.search({ page: 1 });
   }
 
-  public async updateTodo(todoId: string, title?: string, completed?: boolean, priority?: ITodo['priority']) {
+  /**
+   * Met à jour une tâche existante.
+   * @param {string} todoId - L'ID de la tâche
+   * @param {string} [title] - Nouveau titre
+   * @param {boolean} [completed] - Nouveau statut de complétion
+   * @param {string} [priority] - Nouvelle priorité
+   * @returns {Promise<ITodo>} - La tâche mise à jour
+   */
+  public async updateTodo(
+    todoId: string,
+    title?: string,
+    completed?: boolean,
+    priority?: ITodo['priority']
+  ): Promise<ITodo> {
     const todo = await Todo.findById(todoId);
-    if (!todo) throw new Error('Todo not found');
+    if (!todo) throw new Error('Tâche introuvable');
+
     if (title !== undefined) todo.title = title;
     if (completed !== undefined) todo.completed = completed;
     if (priority !== undefined) todo.priority = priority;
+
     return todo.save();
   }
 
-  public async delete(todoId: string) {
+  /**
+   * Supprime une tâche par son ID.
+   * @param {string} todoId - L'ID de la tâche à supprimer
+   * @returns {Promise<ISearchResult>} - Liste des tâches après suppression
+   */
+  public async delete(todoId: string): Promise<ISearchResult> {
     const todo = await Todo.findById(todoId);
-    if (!todo) throw new Error('Todo not found');
+    if (!todo) throw new Error('Tâche introuvable');
+
     await Todo.deleteOne({ _id: todoId });
     await Todo.updateMany({ position: { $gt: todo.position } }, { $inc: { position: -1 } });
-    return this.search({page: 1})
+
+    return this.search({ page: 1 });
   }
 
-  public async reorder(todos: Array<{ _id: string }>) {
+  /**
+   * Modifie l'ordre des tâches.
+   * @param {Array<{_id: string}>} todos - Liste des tâches à réorganiser
+   * @returns {Promise<void>} - Résultat de l'opération de mise à jour
+   */
+  public async reorder(todos: Array<{ _id: string }>): Promise<void> {
     const bulkOps = todos.map((todo, index) => ({
       updateOne: {
         filter: { _id: todo._id },
         update: { position: index + 1 }
       }
     }));
-    return Todo.bulkWrite(bulkOps as never);
+    await Todo.bulkWrite(bulkOps as never);
   }
 
-  public async addTagToTodo(todoId: string, tagId: string) {
+  /**
+   * Ajoute un tag à une tâche.
+   * @param {string} todoId - L'ID de la tâche
+   * @param {string} tagId - L'ID du tag
+   * @returns {Promise<ITodo>} - La tâche mise à jour avec le tag ajouté
+   */
+  public async addTagToTodo(todoId: string, tagId: string): Promise<ITodo> {
     const todo = await Todo.findById(todoId);
+    if (!todo) throw new Error('Tâche introuvable');
+
     const tag = await Tag.findById(tagId);
-    if (!todo) throw new Error('Todo not found');
-    if (!tag) throw new Error('Tag not found');
+    if (!tag) throw new Error('Étiquette non trouvée');
+
     todo.tags.push(tag);
     return todo.save();
   }
 
-  public async removeTagFromTodo(todoId: string, tagId: string) {
+  /**
+   * Supprime un tag d'une tâche.
+   * @param {string} todoId - L'ID de la tâche
+   * @param {string} tagId - L'ID du tag à supprimer
+   * @returns {Promise<ITodo>} - La tâche mise à jour sans le tag
+   */
+  public async removeTagFromTodo(todoId: string, tagId: string): Promise<ITodo> {
     const todo = await Todo.findById(todoId);
-    if (!todo) throw new Error('Todo not found');
+    if (!todo) throw new Error('Tâche introuvable');
+
     todo.tags = todo.tags.filter((tag) => tag.toString() !== tagId);
     return todo.save();
   }
 
-  public async search(params: ISearchParams) {
-    const limit = 10
-
+  /**
+   * Recherche des tâches en fonction de critères donnés.
+   * @param {ISearchParams} params - Paramètres de recherche
+   * @returns {Promise<ISearchResult>} - Résultats de la recherche avec pagination
+   */
+  public async search(params: ISearchParams): Promise<ISearchResult> {
+    const limit = 10;
     const { title, completed, priority, tags, page = 1 } = params;
 
     if (completed && !['true', 'false', 'all'].includes(completed.toString())) {
-      throw new Error("Invalid value for 'completed'. Expected 'true', 'false', or 'all'.");
+      throw new Error("Valeur invalide pour « completed ». La valeur attendue est « true », « false » ou « all ».");
     }
 
     if (priority && !['high', 'medium', 'low', 'all'].includes(priority)) {
-      throw new Error("Invalid value for 'priority'. Expected 'high', 'medium', 'low', or 'all'.");
+      throw new Error("Valeur invalide pour « priority ». Valeur attendue pour « high », « medium », « low » ou « all ».");
     }
 
     const searchConditions: ISearchCondition = {};

@@ -10,10 +10,8 @@ export const makeRequest = async ({ url, method, data = {}, params = {}, headers
       headers,
     });
 
-    // Return the response data
     return response.data;
   } catch (error) {
-    // Handle error and propagate it
     console.error('Error making request:', error.response || error.message);
     throw error.response || error.message;
   }

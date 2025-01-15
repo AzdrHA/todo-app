@@ -11,8 +11,8 @@
 
 <script>
 import TodoList from './components/todo/TodoList.vue';
-import axios from "axios";
 import TodoSearch from './components/todo/TodoSearch.vue';
+import { getTagsRequest } from './api/tagRequest';
 
 export default {
   name: 'App',
@@ -20,16 +20,9 @@ export default {
     TodoSearch,
     TodoList
   },
-  data() {
-    return {
-      test: false
-    };
-  },
-  mounted() {
-    axios.get('api/tags').then(res => {
-      this.$store.commit('setTags', res.data)
-      this.test = true
-    });
+  async mounted() {
+    const tags = await getTagsRequest()
+    this.$store.commit('setTags', tags)
   }
 };
 </script>

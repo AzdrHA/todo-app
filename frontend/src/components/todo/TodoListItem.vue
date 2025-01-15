@@ -9,13 +9,7 @@
   >
     <div class="flex items-center">
       <span class="handle cursor-move mr-2">
-        <svg
-          xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none"
-          viewBox="0 0 24 24" stroke="currentColor">
-          <path
-            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M4 8h16M4 16h16" />
-        </svg>
+        <handle-icon/>
       </span>
       <input
         v-model="completed"
@@ -45,7 +39,7 @@
       </div>
     </div>
     <div class="flex items-center flex-col">
-      <div class="mt-2 relative flex flex-col">
+      <div class="mt-2 relative flex flex-col ml-auto">
         <span
           class="text-xs font-semibold px-2 py-1 rounded-md self-start cursor-pointer"
           :class="{
@@ -55,7 +49,7 @@
           }"
           @click="openPrioritySelect"
         >
-          {{ priority }}
+          {{ transformPriority }}
         </span>
 
         <select
@@ -66,9 +60,9 @@
           @change="updateTodo"
           @blur="closePrioritySelect"
         >
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
+          <option value="low">Basse</option>
+          <option value="medium">Moyenne</option>
+          <option value="high">Haute</option>
         </select>
       </div>
 
@@ -78,13 +72,7 @@
           class="text-red-500 hover:text-red-700 focus:outline-none"
           @click="deleteTodo(todo._id)"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-            viewBox="0 0 24 24" stroke="currentColor">
-            <path
-              stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          <cross-icon/>
         </button>
       </div>
     </div>
@@ -96,10 +84,13 @@
 import TagDropdown from '../tag/TagDropdown.vue';
 import { hexToRgba } from '../../utils/ColorUtil';
 import { updateTodoRequest } from '../../api/totoRequest';
+import HandleIcon from '../../icon/handleIcon.vue';
+import CrossIcon from '../../icon/crossIcon.vue';
+import { translatePriority } from '../../utils/StrUtil';
 
 export default {
   name: 'TodoListItem',
-  components: { TagDropdown },
+  components: { CrossIcon, HandleIcon, TagDropdown },
   props: {
     todo: {
       type: Object,
@@ -114,10 +105,17 @@ export default {
       showPrioritySelect: false
     };
   },
+  computed: {
+    transformPriority () {
+      const translate = translatePriority(this.priority)
+      return translate.charAt(0).toUpperCase() + translate.slice(1)
+    }
+  },
   mounted() {
     this.todoData = this.todo;
   },
   methods: {
+    translatePriority,
     async updateTodo() {
       await updateTodoRequest(this.todo._id, this.completed, this.priority);
     },

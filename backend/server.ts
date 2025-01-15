@@ -24,12 +24,12 @@ const MONGO_URI = process.env.MONGO_URI || 'mongodb://mongo:27017/todos';
 
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`Server is running on port ${PORT}`);
-      // Stocker le port utilisé dans une variable d'environnement pour que le frontend puisse l'utiliser
       process.env.ACTUAL_PORT = PORT.toString();
     });
   } catch (err) {
     console.error('MongoDB connection error:', err);
     process.exit(1);
-
   }
 })()
+
+export default app;
