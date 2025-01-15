@@ -18,7 +18,7 @@
     <div v-if="todo.todos.length === 0" class="text-center text-gray-500">Aucune tâche à afficher</div>
     <div ref="sortableList" class="space-y-2">
       <transition-group>
-        <todo-list-item v-for="todo in todo.todos" :key="todo._id" :todo="todo" @delete-todo="deleteTodo" @update-todo="updateTodo"/>
+        <todo-list-item v-for="todo in todo.todos" :key="todo._id" :todo="todo"/>
       </transition-group>
     </div>
 
@@ -30,16 +30,14 @@
 import Sortable from 'sortablejs';
 import TodoListItem from "./TodoListItem.vue";
 import {
-  addTodoRequest,
-  reorderTodoRequest,
-  updateTodoRequest
+  addTodoRequest, reorderTodoRequest,
 } from '../../api/totoRequest';
 import { mapState } from 'vuex';
 import TodoListPagination from './TodoListPagination.vue';
 
 export default {
   name: 'TodoList',
-  components: { TodoListPagination, TodoListItem},
+  components: { TodoListPagination, TodoListItem },
   data() {
     return {
       newTodo: '',
@@ -60,31 +58,22 @@ export default {
     async addTodo() {
       if (this.newTodo.trim() === '') return;
       try {
-        this.todo.todos.push(await addTodoRequest(this.newTodo));
+        const todos = await addTodoRequest(this.newTodo);
+        this.$store.commit('setTodos', todos);
+        this.todo.filter.page = 1;
         this.newTodo = '';
       } catch (error) {
         console.error(error);
       }
     },
-    async onDragEnd() {
+    async onDragEnd(event) {
       try {
-        await reorderTodoRequest(this.todos)
+        const movedItem = this.todo.todos[event.oldIndex];
+        this.todo.todos.splice(event.oldIndex, 1);
+        this.todo.todos.splice(event.newIndex, 0, movedItem);
+        await reorderTodoRequest(this.todo.todos)
       } catch (error) {
         console.error('Error updating order:', error);
-      }
-    },
-    async updateTodo(id, completed, priority) {
-      try {
-        await updateTodoRequest(id, completed, priority)
-      } catch (error) {
-        console.error(error);
-      }
-    },
-    async deleteTodo(id) {
-      try {
-        this.$store.dispatch('removeTodoById', id);
-      } catch (error) {
-        console.error(error);
       }
     }
   }

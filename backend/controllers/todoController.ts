@@ -15,8 +15,7 @@ class TodoController {
 
   public async create(req: Request, res: Response): Promise<void> {
     try {
-      const newTodo = await TodoService.create(req.body.title);
-      res.status(201).json(newTodo);
+      res.status(201).json(await TodoService.create(req.body.title));
     } catch (error) {
       handleError(error, res);
     }
@@ -33,8 +32,7 @@ class TodoController {
 
   public async delete(req: Request, res: Response): Promise<void> {
     try {
-      await TodoService.delete(req.params.id);
-      res.json({ message: 'Todo deleted' });
+      res.status(201).json(await TodoService.delete(req.params.id));
     } catch (error) {
       handleError(error, res);
     }

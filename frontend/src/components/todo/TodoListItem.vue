@@ -2,9 +2,9 @@
   <li
     class="flex items-center justify-between p-2 bg-gray-50 rounded-md shadow-sm"
     :class="{
-    'border-l-4 border-red-500': todoData.priority === 'high',
-    'border-l-4 border-yellow-500': todoData.priority === 'medium',
-    'border-l-4 border-green-500': todoData.priority === 'low'
+    'border-l-4 border-red-500': priority === 'high',
+    'border-l-4 border-yellow-500': priority === 'medium',
+    'border-l-4 border-green-500': priority === 'low'
   }"
   >
     <div class="flex items-center">
@@ -18,19 +18,19 @@
         </svg>
       </span>
       <input
-        v-model="todoData.completed"
+        v-model="completed"
         type="checkbox"
         class="form-checkbox min-w-4 min-h-4 text-blue-600"
         width="20"
         height="20"
-        @change="updateTodo(todo)"
+        @change="updateTodo"
       />
 
       <div class="flex flex-col">
         <span
           :class="{
-            'line-through text-gray-500': todoData.completed,
-            'text-gray-900': !todoData.completed
+            'line-through text-gray-500': completed,
+            'text-gray-900': !completed
           }"
           class="mx-2"
         > {{ todoData.title }} </span>
@@ -45,39 +45,25 @@
       </div>
     </div>
     <div class="flex items-center flex-col">
-<!--      &lt;!&ndash; Priority badge &ndash;&gt;-->
-<!--      <span-->
-<!--        class="text-xs font-semibold px-2 py-1 rounded-md self-start mt-1"-->
-<!--        :class="{-->
-<!--          'bg-red-100 text-red-600': todoData.priority === 'high',-->
-<!--          'bg-yellow-100 text-yellow-600': todoData.priority === 'medium',-->
-<!--          'bg-green-100 text-green-600': todoData.priority === 'low'-->
-<!--        }"-->
-<!--      >-->
-<!--        {{todoData.priority}}-->
-<!--      </span>-->
-
-      <!-- Priority badge and selector -->
       <div class="mt-2 relative flex flex-col">
         <span
           class="text-xs font-semibold px-2 py-1 rounded-md self-start cursor-pointer"
           :class="{
-            'bg-red-100 text-red-600': todoData.priority === 'high',
-            'bg-yellow-100 text-yellow-600': todoData.priority === 'medium',
-            'bg-green-100 text-green-600': todoData.priority === 'low'
+            'bg-red-100 text-red-600': priority === 'high',
+            'bg-yellow-100 text-yellow-600': priority === 'medium',
+            'bg-green-100 text-green-600': priority === 'low'
           }"
           @click="openPrioritySelect"
         >
-          {{ todoData.priority }}
+          {{ priority }}
         </span>
 
-        <!-- Select dropdown -->
         <select
           v-if="showPrioritySelect"
           ref="prioritySelect"
-          v-model="todoData.priority"
+          v-model="priority"
           class="absolute top-0 left-0 mt-7 h-12 w-36 text-sm border rounded px-2 py-1 bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 z-10"
-          @change="updatePriority(todo._id, todoData.priority)"
+          @change="updateTodo"
           @blur="closePrioritySelect"
         >
           <option value="low">Low</option>
@@ -101,17 +87,18 @@
           </svg>
         </button>
       </div>
-      </div>
+    </div>
   </li>
 </template>
 
 <script>
 
-import TagDropdown from "../tag/TagDropdown.vue";
-import { hexToRgba } from "../../utils/ColorUtil";
+import TagDropdown from '../tag/TagDropdown.vue';
+import { hexToRgba } from '../../utils/ColorUtil';
+import { updateTodoRequest } from '../../api/totoRequest';
 
 export default {
-  name: "TodoListItem",
+  name: 'TodoListItem',
   components: { TagDropdown },
   props: {
     todo: {
@@ -119,10 +106,11 @@ export default {
       required: true
     }
   },
-  emits: ["updateTodo", "deleteTodo"],
   data() {
     return {
       todoData: {},
+      completed: this.todo.completed,
+      priority: this.todo.priority,
       showPrioritySelect: false
     };
   },
@@ -130,11 +118,11 @@ export default {
     this.todoData = this.todo;
   },
   methods: {
-    async updateTodo(todo) {
-      this.$emit("updateTodo", todo._id, this.todoData.completed, this.todoData.priority);
+    async updateTodo() {
+      await updateTodoRequest(this.todo._id, this.completed, this.priority);
     },
-    async deleteTodo(id) {
-      this.$emit("deleteTodo", id);
+    async deleteTodo() {
+      this.$store.dispatch('removeTodoById', this.todo._id);
     },
     liStyle(color) {
       return {
@@ -157,10 +145,7 @@ export default {
     },
     closePrioritySelect() {
       this.showPrioritySelect = false;
-    },
-    async updatePriority(todoId, newPriority) {
-      this.$emit("updateTodo", todoId, this.todoData.completed, newPriority);
-    },
+    }
   }
 };
 </script>

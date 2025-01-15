@@ -12,7 +12,7 @@
     </button>
     <button v-if="isOpen" tabindex="-1" class="fixed inset-0 h-full w-full bg-transparent opacity-50 cursor-default" @click="isOpen = false"></button>
     <div v-if="isOpen" class="absolute right-0 mt-2 p-3 w-72 bg-white shadow-md rounded-lg z-10 border border-gray-200">
-      <form class="flex items-center justify-between mb-3" @submit.prevent="submit">
+      <form class="flex items-center justify-between" @submit.prevent="submit">
         <input
           v-model="tag.title"
           type="text"
@@ -39,9 +39,9 @@
         </button>
       </form>
 
-      <ul class="h-64 overflow-auto	">
+      <ul class="max-h-64 overflow-auto">
         <li v-for="tag in this.tag.tags" :key="tag._id" @click="actionTag(tag)">
-          <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white flex">
+          <a href="#" class="px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white flex">
             {{tag.title}}
 
             <svg v-if="isSelected(tag)" class="h-5 w-5 ml-2" viewBox="0 0 132.29 105.83" xmlns="http://www.w3.org/2000/svg">

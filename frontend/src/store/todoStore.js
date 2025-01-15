@@ -14,24 +14,21 @@ const todoStore = {
     },
   },
   mutations: {
-    setTodos(state, todos) {
-      state.todos = todos;
+    setTodos(state, searchTodo) {
+      state.todos = searchTodo.results;
+      state.totalCount = searchTodo.totalCount
+      state.filter.totalPages = searchTodo.totalPages
     },
     changeLoadingStatus(state, status) {
       state.filter.loading = status;
     }
   },
   actions: {
-    async fetchTodos({ commit, state }, filter) {
-      const response = await searchTodo(filter)
-      commit('setTodos', response.results);
-      state.totalCount = response.totalCount
-      state.filter.totalPages = response.totalPages
+    async fetchTodos({ commit }, filter) {
+      commit('setTodos', await searchTodo(filter));
     },
-    async removeTodoById({ commit, state }, id) {
-      await deleteTodoRequest(id)
-      const todos = state.todos.filter(todo => todo._id !== id);
-      commit('setTodos', todos);
+    async removeTodoById({ commit }, id) {
+      commit('setTodos', await deleteTodoRequest(id));
     }
   },
 }

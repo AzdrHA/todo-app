@@ -13,7 +13,9 @@ class TodoService {
     const maxPositionTodo = await Todo.findOne().sort('-position').exec();
     const newPosition = maxPositionTodo ? maxPositionTodo.position + 1 : 1;
     const todo = new Todo({ title, position: newPosition });
-    return todo.save();
+    await todo.save();
+
+    return this.search({page: 1})
   }
 
   public async updateTodo(todoId: string, title?: string, completed?: boolean, priority?: ITodo['priority']) {
@@ -30,7 +32,7 @@ class TodoService {
     if (!todo) throw new Error('Todo not found');
     await Todo.deleteOne({ _id: todoId });
     await Todo.updateMany({ position: { $gt: todo.position } }, { $inc: { position: -1 } });
-    return todo;
+    return this.search({page: 1})
   }
 
   public async reorder(todos: Array<{ _id: string }>) {
@@ -94,6 +96,7 @@ class TodoService {
 
     const results = await Todo.find(searchConditions)
       .populate('tags')
+      .sort('position')
       .skip(skip)
       .limit(limit)
       .exec();

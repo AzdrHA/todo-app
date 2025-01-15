@@ -28,8 +28,8 @@
             v-model="todo.filter.completed"
             :options="completedOptions"
             :can-clear="false"
-            label="label"            @change="updateFilter"
-
+            label="label"
+            @change="updateFilter"
           />
         </div>
 
@@ -53,9 +53,10 @@
           </label>
           <Multiselect
             v-model="todo.filter.tags"
-            mode="multiple"
+            mode="tags"
             :options="tagsFormated"
             label="label"
+            placeholder="Selectionner un ou plusieurs tags"
             @change="updateFilter"
           />
         </div>
@@ -115,9 +116,13 @@ export default {
     }
   },
   methods: {
-    updateFilter() {
+    updateFilter(newValue) {
       if (this.debounceTimeout) {
         clearTimeout(this.debounceTimeout);
+      }
+
+      if (!newValue) {
+        return;
       }
 
       this.debounceTimeout = setTimeout(() => {

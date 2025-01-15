@@ -9,7 +9,7 @@ export const deleteTodoRequest = async (id) => {
 }
 
 export const reorderTodoRequest = async (todos) => {
-  return makeRequest({url: '/api/todos/reorder', method: 'PUT', data: todos})
+  return makeRequest({url: '/api/todos/reorder', method: 'PUT', data: { todos }})
 }
 
 export const addTodoRequest = async (title) => {
