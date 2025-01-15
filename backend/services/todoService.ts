@@ -4,10 +4,6 @@ import Tag from '../models/Tag';
 import { ISearchCondition } from '../interfaces/ISearchCondition';
 
 class TodoService {
-  public async getAll() {
-    return Todo.find().populate('tags').sort('position').exec();
-  }
-
   public async getTodoById(id: string) {
     return Todo.findById(id);
   }

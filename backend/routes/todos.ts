@@ -4,7 +4,6 @@ import {getTodo} from '../middleware/getTodoMiddleware'
 
 const router = express.Router();
 
-router.get('/', TodoController.getAll);
 router.post('/', TodoController.create);
 router.get('/search', TodoController.search);
 router.put('/reorder', getTodo, TodoController.reorder);

@@ -4,15 +4,6 @@ import { handleError } from '../handler/errorHandler';
 import { ISearchParams } from '../interfaces/ISearchParams';
 
 class TodoController {
-  public async getAll(req: Request, res: Response): Promise<void> {
-    try {
-      const todos = await TodoService.getAll();
-      res.json(todos);
-    } catch (error) {
-      handleError(error, res);
-    }
-  }
-
   public async getTodoById(req: Request, res: Response): Promise<void> {
     try {
       const todo = res.locals.todo;
