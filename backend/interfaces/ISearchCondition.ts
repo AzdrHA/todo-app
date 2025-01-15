@@ -1,5 +1,6 @@
 export interface ISearchCondition {
-  title: unknown;
+  title?: unknown;
   completed?: unknown;
   priority?: unknown;
+  tags?: unknown;
 }

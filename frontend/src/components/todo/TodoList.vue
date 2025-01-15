@@ -21,6 +21,8 @@
         <todo-list-item v-for="todo in todo.todos" :key="todo._id" :todo="todo" @delete-todo="deleteTodo" @update-todo="updateTodo"/>
       </transition-group>
     </div>
+
+    <todo-list-pagination/>
   </div>
 </template>
 
@@ -33,15 +35,14 @@ import {
   updateTodoRequest
 } from '../../api/totoRequest';
 import { mapState } from 'vuex';
+import TodoListPagination from './TodoListPagination.vue';
 
 export default {
   name: 'TodoList',
-  components: {TodoListItem},
+  components: { TodoListPagination, TodoListItem},
   data() {
     return {
       newTodo: '',
-      color: '#FF0000',
-      size: '54px'
     };
   },
   computed: {
@@ -67,7 +68,7 @@ export default {
     },
     async onDragEnd() {
       try {
-        await reorderTodoRequest(this.todo.todos)
+        await reorderTodoRequest(this.todos)
       } catch (error) {
         console.error('Error updating order:', error);
       }

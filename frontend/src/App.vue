@@ -20,9 +20,15 @@ export default {
     TodoSearch,
     TodoList
   },
-  created() {
+  data() {
+    return {
+      test: false
+    };
+  },
+  mounted() {
     axios.get('api/tags').then(res => {
       this.$store.commit('setTags', res.data)
+      this.test = true
     });
   }
 };

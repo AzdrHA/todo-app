@@ -2,6 +2,7 @@ import Todo from '../models/Todo';
 import { ISearchParams } from '../interfaces/ISearchParams';
 import Tag from '../models/Tag';
 import { ISearchCondition } from '../interfaces/ISearchCondition';
+import { ITodo } from '../interfaces/ITodo';
 
 class TodoService {
   public async getTodoById(id: string) {
@@ -15,7 +16,7 @@ class TodoService {
     return todo.save();
   }
 
-  public async updateTodo(todoId: string, title?: string, completed?: boolean, priority?: string) {
+  public async updateTodo(todoId: string, title?: string, completed?: boolean, priority?: ITodo['priority']) {
     const todo = await Todo.findById(todoId);
     if (!todo) throw new Error('Todo not found');
     if (title !== undefined) todo.title = title;
@@ -59,7 +60,9 @@ class TodoService {
   }
 
   public async search(params: ISearchParams) {
-    const { title, completed, priority } = params;
+    const limit = 10
+
+    const { title, completed, priority, tags, page = 1 } = params;
 
     if (completed && !['true', 'false', 'all'].includes(completed.toString())) {
       throw new Error("Invalid value for 'completed'. Expected 'true', 'false', or 'all'.");
@@ -83,7 +86,26 @@ class TodoService {
       searchConditions.priority = priority;
     }
 
-    return await Todo.find(searchConditions).populate('tags').exec();
+    if (tags && tags.length > 0) {
+      searchConditions.tags = { $in: tags };
+    }
+
+    const skip = (page - 1) * limit;
+
+    const results = await Todo.find(searchConditions)
+      .populate('tags')
+      .skip(skip)
+      .limit(limit)
+      .exec();
+
+    const totalCount = await Todo.countDocuments(searchConditions).exec();
+
+    return {
+      results,
+      totalCount,
+      page,
+      totalPages: Math.ceil(totalCount / limit),
+    };
   }
 }
 

@@ -69,9 +69,9 @@ class TodoController {
 
   public async search(req: Request, res: Response): Promise<void> {
     try {
-      const { title, completed, priority } = req.query;
+      const { title, completed, priority, tags, page } = req.query;
 
-      const searchParams: ISearchParams = {};
+      const searchParams: ISearchParams = {page: Number(page) || 1};
 
       if (title) {
         searchParams.title = title as string;
@@ -83,6 +83,10 @@ class TodoController {
 
       if (priority && priority !== 'all') {
         searchParams.priority = priority as 'high' | 'medium' | 'low';
+      }
+
+      if (tags) {
+        searchParams.tags = (tags as string).split(',');
       }
 
       const tasks = await TodoService.search(searchParams);

@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.post('/', TodoController.create);
 router.get('/search', TodoController.search);
-router.put('/reorder', getTodo, TodoController.reorder);
+router.put('/reorder', TodoController.reorder);
 router.get('/:id', getTodo, TodoController.getTodoById);
 router.patch('/:id', getTodo, TodoController.patch);
 router.delete('/:id', getTodo, TodoController.delete);
