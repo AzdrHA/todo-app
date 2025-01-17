@@ -52,7 +52,7 @@ $ docker compose up
 
 #### 1. Accéder à l'Application
 - Frontend : http://localhost:8080
-- Backend API : http://localhost:5001/api/todos
+- Backend API : http://localhost:5000/api/todos
 
 ## Endpoints
 
