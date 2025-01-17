@@ -1,7 +1,7 @@
 import { makeRequest } from "./request";
 
-export const updateTodoRequest = async (id, completed, priority) => {
-  return makeRequest({url: `/api/todos/${id}`, data: {completed, priority}, method: "PATCH"})
+export const updateTodoRequest = async (id, title, completed, priority) => {
+  return makeRequest({url: `/api/todos/${id}`, data: {title, completed, priority}, method: "PATCH"})
 }
 
 export const deleteTodoRequest = async (id) => {
@@ -9,7 +9,7 @@ export const deleteTodoRequest = async (id) => {
 }
 
 export const reorderTodoRequest = async (todos) => {
-  return makeRequest({url: '/api/todos/reorder', method: 'PUT', data: { todos }})
+  return makeRequest({url: '/api/todos/reorder', method: 'PATCH', data: { todos }})
 }
 
 export const addTodoRequest = async (title) => {
@@ -21,9 +21,9 @@ export const searchTodo = async (filter) => {
 }
 
 export const removeTagFromTodo = async (todoId, tagId) => {
-  return makeRequest({url: `/api/todos/${todoId}/${tagId}`, method: 'DELETE'})
+  return makeRequest({url: `/api/todos/${todoId}/tags/${tagId}`, method: 'DELETE'})
 }
 
 export const addTagToTodo = async (todoId, tagId) => {
-  return makeRequest({url: `/api/todos/${todoId}/${tagId}`, method: 'POST'})
+  return makeRequest({url: `/api/todos/${todoId}/tags/${tagId}`, method: 'POST'})
 }

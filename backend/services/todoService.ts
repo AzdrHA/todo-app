@@ -45,7 +45,7 @@ class TodoService {
     priority?: ITodo['priority']
   ): Promise<ITodo> {
     const todo = await Todo.findById(todoId);
-    if (!todo) throw new Error('Tâche introuvable');
+    if (!todo) throw new Error('Tâche introuvable.');
 
     if (title !== undefined) todo.title = title;
     if (completed !== undefined) todo.completed = completed;
@@ -61,7 +61,7 @@ class TodoService {
    */
   public async delete(todoId: string): Promise<ISearchResult> {
     const todo = await Todo.findById(todoId);
-    if (!todo) throw new Error('Tâche introuvable');
+    if (!todo) throw new Error('Tâche introuvable.');
 
     await Todo.deleteOne({ _id: todoId });
     await Todo.updateMany({ position: { $gt: todo.position } }, { $inc: { position: -1 } });
@@ -92,14 +92,20 @@ class TodoService {
    */
   public async addTagToTodo(todoId: string, tagId: string): Promise<ITodo> {
     const todo = await Todo.findById(todoId);
-    if (!todo) throw new Error('Tâche introuvable');
+    if (!todo) throw new Error('Tâche introuvable.');
 
     const tag = await Tag.findById(tagId);
-    if (!tag) throw new Error('Étiquette non trouvée');
+    if (!tag) throw new Error('Étiquette non trouvée.');
+
+    const tagExists = todo.tags.some(existingTag => existingTag._id.toString() === tagId);
+    if (tagExists) {
+      return todo;
+    }
 
     todo.tags.push(tag);
     return todo.save();
   }
+
 
   /**
    * Supprime un tag d'une tâche.
@@ -109,7 +115,10 @@ class TodoService {
    */
   public async removeTagFromTodo(todoId: string, tagId: string): Promise<ITodo> {
     const todo = await Todo.findById(todoId);
-    if (!todo) throw new Error('Tâche introuvable');
+    if (!todo) throw new Error('Tâche introuvable.');
+
+    const tag = await Tag.findById(tagId);
+    if (!tag) throw new Error('Étiquette non trouvée.');
 
     todo.tags = todo.tags.filter((tag) => tag.toString() !== tagId);
     return todo.save();
@@ -123,14 +132,6 @@ class TodoService {
   public async search(params: ISearchParams): Promise<ISearchResult> {
     const limit = 10;
     const { title, completed, priority, tags, page = 1 } = params;
-
-    if (completed && !['true', 'false', 'all'].includes(completed.toString())) {
-      throw new Error("Valeur invalide pour « completed ». La valeur attendue est « true », « false » ou « all ».");
-    }
-
-    if (priority && !['high', 'medium', 'low', 'all'].includes(priority)) {
-      throw new Error("Valeur invalide pour « priority ». Valeur attendue pour « high », « medium », « low » ou « all ».");
-    }
 
     const searchConditions: ISearchCondition = {};
 

@@ -48,7 +48,6 @@
 <script>
 import { createTagRequest } from "../../api/tagRequest";
 import { mapState } from "vuex";
-import axios from "axios";
 import TagIcon from '../../icon/tagIcon.vue';
 import AddIcon from '../../icon/addIcon.vue';
 import CheckIcon from '../../icon/checkIcon.vue';

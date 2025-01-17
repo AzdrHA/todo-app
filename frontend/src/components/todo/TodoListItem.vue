@@ -117,7 +117,7 @@ export default {
   methods: {
     translatePriority,
     async updateTodo() {
-      await updateTodoRequest(this.todo._id, this.completed, this.priority);
+      await updateTodoRequest(this.todo._id, this.todo.title, this.completed, this.priority);
     },
     async deleteTodo() {
       this.$store.dispatch('removeTodoById', this.todo._id);

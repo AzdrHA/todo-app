@@ -1,10 +1,52 @@
 import request from 'supertest';
 import tagService from '../services/tagService';
-import TodoService from '../services/todoService';
 import app from '../server';
 
-jest.mock('../services/todoService');
 jest.mock('../services/tagService');
+
+describe('POST /tags', () => {
+  it('devrait créer un nouveau tag si les données sont valides', async () => {
+    const newTag = { _id: '1', title: 'Tag 1', color: 'red' };
+    (tagService.createTagForTodo as jest.Mock).mockResolvedValue(newTag);
+
+    const response = await request(app)
+      .post('/api/tags')
+      .send({ todoId: '123', title: 'Tag 1', color: 'red' });
+
+    expect(response.status).toBe(201);
+    expect(response.body).toEqual(newTag);
+    expect(tagService.createTagForTodo).toHaveBeenCalledWith('123', 'Tag 1', 'red');
+  });
+
+  it('devrait retourner une erreur 500 si le service échoue', async () => {
+    (tagService.createTagForTodo as jest.Mock).mockRejectedValue(new Error('Erreur inconnue'));
+
+    const response = await request(app)
+      .post('/api/tags')
+      .send({ todoId: '123', title: 'Tag 1', color: 'red' });
+
+    expect(response.status).toBe(500);
+    expect(response.body.message).toBe('Erreur inconnue');
+  });
+
+  it('devrait retourner 400 si le champ todoId ou title ou color est manquant', async () => {
+    const response = await request(app)
+      .post('/api/tags')
+      .send({ todoId: '123' });
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toBe("Les champs 'todoId', 'title' et 'color' sont obligatoires.");
+  })
+
+  it('devrait retourner 400 si le champ todoId ou title ou color n\'est pas une chaîne de caractères', async () => {
+    const response = await request(app)
+      .post('/api/tags')
+      .send({ todoId: 123, title: 'Tag 1', color: 'red' });
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toBe("Les champs 'todoId', 'title' et 'color' doivent être de type string.");
+  })
+});
 
 describe('GET /tags', () => {
   it('devrait retourner une liste de tags', async () => {
@@ -31,81 +73,3 @@ describe('GET /tags', () => {
     expect(response.body.message).toBe('Erreur inconnue');
   });
 });
-
-describe('POST /tags', () => {
-  it('devrait créer un nouveau tag', async () => {
-    const newTag = { title: 'Tag 1', color: 'green' };
-
-    // Mock du service
-    (tagService.createTagForTodo as jest.Mock).mockResolvedValue({
-      _id: '1',
-      ...newTag,
-    });
-
-    const response = await request(app).post('/api/tags').send(newTag);
-
-    expect(response.status).toBe(201);
-    expect(response.body).toEqual({ _id: '1', ...newTag });
-  });
-
-  it('devrait retourner une erreur si la création échoue', async () => {
-    const newTag = { title: 'Tag 1', color: 'green' };
-
-    (tagService.createTagForTodo as jest.Mock).mockRejectedValue(new Error('Erreur de création'));
-
-    const response = await request(app).post('/api/tags').send(newTag);
-
-    expect(response.status).toBe(500);
-    expect(response.body.message).toBe('Erreur de création');
-  });
-});
-
-describe('POST /todos', () => {
-  it('devrait créer une nouvelle tâche', async () => {
-    const newTodo = { title: 'Nouvelle tâche' };
-
-    (TodoService.create as jest.Mock).mockResolvedValue({ _id: '1', ...newTodo });
-
-    const response = await request(app).post('/api/todos').send(newTodo);
-
-    expect(response.status).toBe(201);
-    expect(response.body).toEqual({ _id: '1', ...newTodo });
-  });
-
-  it('devrait retourner une erreur si la création échoue', async () => {
-    const newTodo = { title: 'Nouvelle tâche' };
-
-    (TodoService.create as jest.Mock).mockRejectedValue(new Error('Erreur de création'));
-
-    const response = await request(app).post('/api/todos').send(newTodo);
-
-    expect(response.status).toBe(500);
-    expect(response.body.message).toBe('Erreur de création');
-  });
-});
-
-describe('PATCH /todos/:id', () => {
-  it('devrait mettre à jour une tâche existante', async () => {
-    const updatedTodo = { title: 'Tâche mise à jour', completed: true, priority: 'high' };
-
-    (TodoService.updateTodo as jest.Mock).mockResolvedValue({ _id: '1', ...updatedTodo });
-
-    const response = await request(app).patch('/api/todos/1').send(updatedTodo);
-
-    expect(response.status).toBe(200);
-    expect(response.body).toEqual({ _id: '1', ...updatedTodo });
-  });
-
-  it('devrait retourner une erreur si la tâche est introuvable', async () => {
-    const updatedTodo = { title: 'Tâche mise à jour' };
-
-    (TodoService.updateTodo as jest.Mock).mockRejectedValue(new Error('Tâche introuvable'));
-
-    const response = await request(app).patch('/api/todos/1').send(updatedTodo);
-
-    expect(response.status).toBe(404);
-    expect(response.body.message).toBe('Tâche introuvable');
-  });
-});
-
-

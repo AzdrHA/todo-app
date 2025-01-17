@@ -8,12 +8,13 @@ import TodoService from '../services/todoService'
  * @param {NextFunction} next - La fonction next pour passer au middleware suivant
  * @returns {void} - Aucune valeur retournée directement, mais passe au middleware suivant si la tâche est trouvée
  */
-export async function getTodo(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function getTodoMiddleware(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const todo = await TodoService.getTodoById(req.params.id);
 
     if (!todo) {
-      res.status(404).json({ message: 'Tâche introuvable' });
+      res.status(404).json({ message: 'Tâche introuvable.' });
+      return;
     }
 
     res.locals.todo = todo;
@@ -22,5 +23,6 @@ export async function getTodo(req: Request, res: Response, next: NextFunction): 
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erreur inconnue';
     res.status(500).json({ message });
+    return;
   }
 }

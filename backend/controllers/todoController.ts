@@ -11,11 +11,7 @@ class TodoController {
    * @returns {Promise<void>} - Réponse avec la tâche
    */
   public async getTodoById(req: Request, res: Response): Promise<void> {
-    try {
-      res.status(200).json(res.locals.todo);
-    } catch (error) {
-      handleError(error, res);
-    }
+    res.status(200).json(res.locals.todo);
   }
 
   /**
@@ -30,6 +26,7 @@ class TodoController {
 
       if (!title || typeof title !== 'string') {
         res.status(400).json({ message: 'Le titre est requis et doit être une chaîne de caractères.' });
+        return;
       }
 
       const newTodo = await TodoService.create(title);
@@ -50,9 +47,19 @@ class TodoController {
       const { id } = req.params;
       const { title, completed, priority } = req.body;
 
-      // Validation des données entrantes
       if (!title || typeof title !== 'string') {
         res.status(400).json({ message: 'Le titre est requis et doit être une chaîne de caractères.' });
+        return;
+      }
+
+      if (completed && !['true', 'false'].includes(completed.toString())) {
+        res.status(400).json({ message: 'Valeur invalide pour « completed ». La valeur attendue est « true » ou « false ».' });
+        return
+      }
+
+      if (priority && !['high', 'medium', 'low'].includes(priority.toString())) {
+        res.status(400).json({ message: 'Valeur invalide pour « priority ». Valeur attendue pour « high », « medium », « low ».' });
+        return
       }
 
       const updatedTodo = await TodoService.updateTodo(id, title, completed, priority);
@@ -72,7 +79,7 @@ class TodoController {
     try {
       const { id } = req.params;
       await TodoService.delete(id);
-      res.status(200).json({ message: 'Tâche supprimée avec succès' });
+      res.status(200).json({ message: 'Tâche supprimée avec succès.' });
     } catch (error) {
       handleError(error, res);
     }
@@ -90,10 +97,11 @@ class TodoController {
 
       if (!Array.isArray(todos)) {
         res.status(400).json({ message: 'Les tâches doivent être envoyées sous forme de tableau.' });
+        return;
       }
 
       await TodoService.reorder(todos);
-      res.status(200).json({ message: 'Ordre mis à jour avec succès' });
+      res.status(200).json({ message: 'Ordre mis à jour avec succès.' });
     } catch (error) {
       handleError(error, res);
     }
@@ -146,6 +154,16 @@ class TodoController {
       const searchParams: ISearchParams = {
         page: Number(page) || 1
       };
+
+      if (completed && !['true', 'false', 'all'].includes(completed.toString())) {
+        res.status(400).json({ message: 'Valeur invalide pour « completed ». La valeur attendue est « true », « false » ou « all ».' });
+        return
+      }
+
+      if (priority && !['high', 'medium', 'low', 'all'].includes(priority.toString())) {
+        res.status(400).json({ message: 'Valeur invalide pour « priority ». Valeur attendue pour « high », « medium », « low » ou « all ».' });
+        return
+      }
 
       if (title) searchParams.title = title as string;
       if (completed !== undefined && completed !== 'all') searchParams.completed = completed === 'true';

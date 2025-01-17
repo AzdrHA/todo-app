@@ -27,8 +27,9 @@ const todoStore = {
     async fetchTodos({ commit }, filter) {
       commit('setTodos', await searchTodo(filter));
     },
-    async removeTodoById({ commit }, id) {
-      commit('setTodos', await deleteTodoRequest(id));
+    async removeTodoById({ commit, state }, id) {
+      await deleteTodoRequest(id)
+      commit('setTodos', await searchTodo(state.filter));
     }
   },
 }

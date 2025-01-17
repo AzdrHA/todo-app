@@ -13,9 +13,9 @@ Cette section détaille les nouveaux endpoints ajoutés à l'API. Chaque endpoin
 - **Description** : Crée une nouvelle tâche.
 
 #### **Paramètres**
-| Nom   | Type   | Requis | Description                |
-|-------|--------|--------|----------------------------|
-| title | String | Oui    | Le titre de la tâche.|
+| Nom   | Type                | Requis | Description                |
+|-------|---------------------|--------|----------------------------|
+| `title` | Chaine de caractère | Oui    | Le titre de la tâche.|
 
 #### **Exemple de Requête**
 ```json
@@ -34,8 +34,25 @@ Cette section détaille les nouveaux endpoints ajoutés à l'API. Chaque endpoin
   "priority": "medium",
   "tags": []
 }
-
 ```
+
+#### **Réponse en cas d'erreur**
+```js
+{
+  // Si le champ 'title' est manquant
+  // HTTP code 400
+  message: "Le champ 'title' est obligatoire."
+}
+```
+```js
+{
+  // Si le champ 'title' n'est pas de type string
+  // HTTP code 400
+  message: "Le titre est requis et doit être une chaîne de caractères."
+}
+```
+
+---
 
 ### **1.2. Rechercher des Tâches**
 - **Méthode** : `GET`
@@ -43,16 +60,18 @@ Cette section détaille les nouveaux endpoints ajoutés à l'API. Chaque endpoin
 - **Description** : Rechercher des tâches en fonction de certains critères.
 
 #### **Paramètres**
-| Nom        | Type                                 | Requis | Description                                               |
-|------------|--------------------------------------|--------|-----------------------------------------------------------|
-| title      | String                               | Oui    | Titre de la tâche à rechercher (obligatoire).             |
-| completed  | String                               | Non    | Filtrer par statut de complétion ("true", "false", "all"). |
-| priority   | Enum["high", "medium", "low", "all"] | Non | Filtrer par niveau de priorité.                           |
+| Nom       | Type                                 | Requis | Description                                               |
+|-----------|--------------------------------------|--------|-----------------------------------------------------------|
+| `title`     | Chaine de caractère                  | Oui    | Titre de la tâche à rechercher (obligatoire).             |
+| `completed` | Chaine de caractère                  | Non    | Filtrer par statut de complétion ("true", "false", "all"). |
+| `priority`  | `Enum["high", "medium", "low", "all"]` | Non    | Filtrer par niveau de priorité.                           |
+| `tags`      | `Tags[]`                               | Non    | Filtrer par niveau de priorité.                           |
+| `page`      | Nombre                               | Oui    | Filtrer par niveau de priorité.                           |
 
 #### **Exemple de Requête**
 Rechercher toutes les tâches avec le titre "Test" et la priorité "high" :
 ```http
-GET /api/todos/search?title=Test&priority=high
+GET /api/todos/search?title=Test&priority=high&page=1&completed=all&tags=64b8fd2e9c8a2d1f0c8e91a7,64b8fd2e9c8a2d1f0c8e91a8
 ```
 
 #### **Exemple de Réponse**
@@ -74,18 +93,35 @@ GET /api/todos/search?title=Test&priority=high
   }
 ]
 ```
+#### **Réponse en cas d'erreur**
+```js
+{
+  // Si completed n'est pas 'true', 'false' ou 'all'
+  // HTTP code 400
+  message: "Valeur invalide pour « completed ». La valeur attendue est « true », « false » ou « all »."
+}
+```
+```js
+{
+  // Si priority n'est pas 'high', 'medium', 'low' ou 'all'
+  // HTTP code 400
+  message: "Valeur invalide pour « priority ». Valeur attendue pour « high », « medium », « low » ou « all »."
+}
+```
+
+---
 
 ### **1.3. Réorganiser les Tâches**
-- **Méthode** : `POST`
+- **Méthode** : `PATCH`
 - **URL** : `/api/todos/reorder`
 - **Description** : Permet de réorganiser l'ordre des tâches en fonction de l'ordre dans le tableau passé en paramètre. La position de chaque tâche sera mise à jour dans la base de données.
 
 #### **Paramètres**
 Le corps de la requête doit contenir un tableau d'objets avec les identifiants des tâches (_id) dans l'ordre souhaité.
 
-| Nom   | Type   | Requis | Description                                     |
-|-------|--------|--------|-------------------------------------------------|
-| _id   | Array  | Oui    | Liste des objets contenant les identifiants (`_id`) des tâches dans l'ordre désiré. |
+| Nom   | Type                                | Requis | Description                                     |
+|-------|-------------------------------------|--------|-------------------------------------------------|
+| `todos` | Chaine de caractère dans un tableau | Oui    | Liste des objets contenant les identifiants (`_id`) des tâches dans l'ordre désiré. |
 
 #### **Exemple de Requête**
 ```json
@@ -98,8 +134,18 @@ Le corps de la requête doit contenir un tableau d'objets avec les identifiants 
 
 #### **Exemple de Réponse**
 ```json
-{ "message": "Order updated" }
+{ "message": "Ordre mis à jour avec succès." }
 ```
+#### **Réponse en cas d'erreur**
+```js
+{
+  // Si le champ 'todos' est manquant
+  // HTTP code 400
+  message: "Les tâches doivent être envoyées sous forme de tableau."
+}
+```
+
+---
 
 ### **1.4. Récupérer une Tâche par son ID**
 - **Méthode** : `GET`
@@ -131,6 +177,14 @@ GET /api/todos/64b8fd2e9c8a2d1f0c8e91a7
   ]
 }
 ```
+#### **Réponse en cas d'erreur**
+```js
+{
+  // Si la tâche n'existe pas
+  // HTTP code 404
+  message: "Tâche introuvable."
+}
+```
 
 ### **1.5. Mettre à jour une Tâche par son ID**
 - **Méthode** : `PATCH`
@@ -140,10 +194,10 @@ GET /api/todos/64b8fd2e9c8a2d1f0c8e91a7
 #### **Paramètres**
 - **`:id`** : L'identifiant unique de la tâche. Ce paramètre doit être passé dans l'URL.
 
-| Nom          | Type                       | Requis | Description                                                   |
-|--------------|----------------------------|--------|---------------------------------------------------------------|
-| `title`      | `String`                    | Non    | Nouveau titre de la tâche.                                   |
-| `completed`  | `Boolean`                   | Non    | Nouveau statut de complétion de la tâche (`true` ou `false`). |
+| Nom          | Type                    | Requis | Description                                                   |
+|--------------|-------------------------|--------|---------------------------------------------------------------|
+| `title`      | Chaine de caractère     | Non    | Nouveau titre de la tâche.                                   |
+| `completed`  | Booléen                 | Non    | Nouveau statut de complétion de la tâche (`true` ou `false`). |
 | `priority`   | `Enum["high", "medium", "low"]` | Non    | Nouvelle priorité de la tâche.                               |
 
 #### **Exemple d'URL**
@@ -158,6 +212,38 @@ PATCH /api/todos/64b8fd2e9c8a2d1f0c8e91a7
   "priority": "high"
 }
 ```
+
+#### **Réponse en cas d'erreur**
+```js
+{
+  // Si le champ 'title' n'est pas de type string
+  // HTTP code 400
+  message: "Le titre doit être une chaîne de caractères."
+}
+```
+```js
+{
+  // Si le champ 'completed' n'est pas un booléen
+  // HTTP code 400
+  message: "Le statut de complétion doit être un booléen."
+}
+```
+```js
+{
+  // Si le champ 'priority' n'est pas 'high', 'medium', 'low'
+  // HTTP code 400
+  message: "La priorité doit être 'high', 'medium' ou 'low'."
+}
+```
+```js
+{
+  // Si l'ID de la tâche est invalide
+  // HTTP code 404
+  message: "Tâche introuvable."
+}
+```
+
+---
 
 ### **1.6. Supprimer une Tâche par son ID**
 - **Méthode** : `DELETE`
@@ -175,8 +261,19 @@ DELETE /api/todos/64b8fd2e9c8a2d1f0c8e91a7
 
 #### **Exemple de Réponse**
 ```json
-{ "message": "Todo deleted" }
+{ "message": "Tâche supprimée avec succès." }
 ```
+
+#### **Réponse en cas d'erreur**
+```js
+{
+  // Si l'ID de la tâche est invalide
+  // HTTP code 404
+  message: "Tâche introuvable."
+}
+```
+
+---
 
 ### **1.6. Ajouter un Tag à une Tâche**
 - **Méthode** : `POST`
@@ -190,7 +287,7 @@ DELETE /api/todos/64b8fd2e9c8a2d1f0c8e91a7
 #### **Exemple de Requête**
 Ajouter un tag à une tâche en spécifiant les IDs :
 ```http
-POST /api/todos/64b8fd2e9c8a2d1f0c8e91a7/64b8fd2e9c8a2d1f0c8e91a8
+POST /api/todos/64b8fd2e9c8a2d1f0c8e91a7/tags/64b8fd2e9c8a2d1f0c8e91a8
 ```
 
 #### **Exemple de Réponse**
@@ -215,6 +312,24 @@ POST /api/todos/64b8fd2e9c8a2d1f0c8e91a7/64b8fd2e9c8a2d1f0c8e91a8
   ]
 }
 ```
+
+#### **Réponse en cas d'erreur**
+```js
+{
+  // Si l'ID de la tâche est invalide
+  // HTTP code 404
+  message: "Tâche introuvable."
+}
+```
+```js
+{
+  // Si l'ID de la tâche est invalide
+  // HTTP code 404
+  message: "Étiquette non trouvée."
+}
+```
+
+---
 
 ### **1.7. Retirer un Tag d'une Tâche**
 - **Méthode** : `DELETE`
@@ -246,5 +361,21 @@ DELETE /api/todos/64b8fd2e9c8a2d1f0c8e91a7/64b8fd2e9c8a2d1f0c8e91a8
       "color": "#FFFF00"
     }
   ]
+}
+```
+
+#### **Réponse en cas d'erreur**
+```js
+{
+  // Si l'ID de la tâche est invalide
+  // HTTP code 404
+  message: "Tâche introuvable."
+}
+```
+```js
+{
+  // Si l'ID de la tâche est invalide
+  // HTTP code 404
+  message: "Étiquette non trouvée."
 }
 ```

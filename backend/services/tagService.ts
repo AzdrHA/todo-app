@@ -14,12 +14,12 @@ class TagService {
   public async createTagForTodo(todoId: string, title: string, color: string): Promise<ITag> {
     const existingTag = await Tag.findOne({ title, color });
     if (existingTag) {
-      throw new Error('Un tag avec ce titre et cette couleur existe déjà');
+      throw new Error('Un tag avec ce titre et cette couleur existe déjà.');
     }
 
     const todo = await Todo.findById(todoId);
     if (!todo) {
-      throw new Error('Tâche introuvable');
+      throw new Error('Tâche introuvable.');
     }
 
     const tag = await Tag.create({ title, color });

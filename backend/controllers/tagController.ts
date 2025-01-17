@@ -30,14 +30,16 @@ class TagController {
 
       if (!todoId || !title || !color) {
         res.status(400).json({
-          error: "Les champs 'todoId', 'title' et 'color' sont obligatoires.",
+          message: "Les champs 'todoId', 'title' et 'color' sont obligatoires.",
         });
+        return;
       }
 
       if (typeof todoId !== 'string' || typeof title !== 'string' || typeof color !== 'string') {
         res.status(400).json({
-          error: "Les champs 'todoId', 'title' et 'color' doivent être de type string.",
+          message: "Les champs 'todoId', 'title' et 'color' doivent être de type string.",
         });
+        return;
       }
 
       const newTag = await tagService.createTagForTodo(todoId, title, color);

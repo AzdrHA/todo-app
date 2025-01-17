@@ -36,6 +36,37 @@ Cette section détaille les nouveaux endpoints ajoutés à l'API. Chaque endpoin
   "color": "#FF0000"
 }
 ```
+#### **Réponse en cas d'erreur**
+```js
+{
+  // Si le champ 'todoId' ou 'title' ou 'color' est manquant
+  // HTTP code 400
+  message: "Les champs 'todoId', 'title' et 'color' sont obligatoires."
+}
+```
+```js
+{
+  // Si le champ 'todoId' ou 'title' ou 'color' est manquant
+  // HTTP code 400
+  message: "Les champs 'todoId', 'title' et 'color' doivent être de type string."
+}
+```
+```js
+{
+  // Si le tag existe déjà
+  // HTTP code 400
+  message: "Un tag avec ce titre et cette couleur existe déjà."
+}
+```
+```js
+{
+  // Si la todo n'existe pas
+  // HTTP code 404
+  message: "Tâche introuvable."
+}
+```
+
+---
 
 ### **1.2. Lister les Tags**
 - **Méthode** : `GET`

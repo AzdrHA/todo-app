@@ -61,13 +61,15 @@ Voici la liste des endpoints disponibles dans l'API :
 #### 1. <a href="/docs/endpoints/todo.md">Endpoints Todo</a>
 - **POST /api/todos** - Crée une nouvelle tâche.
 - **GET /api/todos/search** - Rechercher des tâches en fonction de certains critères.
-- **PUT /api/todos/reorder** - Permet de réorganiser l'ordre des tâches en fonction de l'ordre dans le tableau passé en paramètre.
+- **PATCH /api/todos/reorder** - Permet de réorganiser l'ordre des tâches en fonction de l'ordre dans le tableau passé en paramètre.
 - **GET /api/todos/:id** - Récupère une tâche spécifique en fonction de son identifiant unique `_id`.
 - **PATCH /api/todos/:id** - Met à jour une tâche existante en fonction de son identifiant unique `_id`.
 - **DELETE /api/todos/:id** - Supprime une tâche spécifique en fonction de son identifiant unique `_id`.
-- **POST /api/todos/:id/:tagId** - Permet d'ajouter un tag spécifique à une tâche en fonction de leurs identifiants respectifs
-- **DELETE /api/todos/:id/:tagId** - Permet de retirer un tag spécifique d'une tâche en fonction de leurs identifiants respectifs.
+- **POST /api/todos/:id/tags/:tagId** - Permet d'ajouter un tag spécifique à une tâche en fonction de leurs identifiants respectifs
+- **DELETE /api/todos/:id/tags/:tagId** - Permet de retirer un tag spécifique d'une tâche en fonction de leurs identifiants respectifs.
 
 #### 2. <a href="/docs/endpoints/tag.md">Endpoints Tag</a>
 - **POST /api/tags** - Crée un nouveau tag.
 - **GET /api/tags** - Récupère la liste de tous les tags.
+
+## <a href="/docs/database.md">Documentation Base de données</a>

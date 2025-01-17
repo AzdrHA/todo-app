@@ -25,12 +25,12 @@ describe('handleError', () => {
   });
 
   it('devrait gérer une erreur avec message "Tâche introuvable" et renvoyer le statut 404', () => {
-    const error = new Error('Tâche introuvable');
+    const error = new Error('Tâche introuvable.');
 
     handleError(error, res as Response);
 
     expect(res.status).toHaveBeenCalledWith(404);
-    expect(res.json).toHaveBeenCalledWith({ message: 'Tâche introuvable' });
+    expect(res.json).toHaveBeenCalledWith({ message: 'Tâche introuvable.' });
   });
 
   it('devrait gérer une erreur avec message générique et renvoyer le statut 500', () => {
