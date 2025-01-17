@@ -333,7 +333,7 @@ POST /api/todos/64b8fd2e9c8a2d1f0c8e91a7/tags/64b8fd2e9c8a2d1f0c8e91a8
 
 ### **1.7. Retirer un Tag d'une Tâche**
 - **Méthode** : `DELETE`
-- **URL** : `/api/todos/:id/:tagId`
+- **URL** : `/api/todos/:id/tags/:tagId`
 - **Description** : Permet de retirer un tag spécifique d'une tâche en fonction de leurs identifiants respectifs. L'ID du tag est supprimé de la liste des tags de la tâche spécifiée.
 
 #### **Paramètres**
@@ -343,7 +343,7 @@ POST /api/todos/64b8fd2e9c8a2d1f0c8e91a7/tags/64b8fd2e9c8a2d1f0c8e91a8
 #### **Exemple de Requête**
 Retirer un tag d'une tâche en spécifiant les IDs :
 ```http
-DELETE /api/todos/64b8fd2e9c8a2d1f0c8e91a7/64b8fd2e9c8a2d1f0c8e91a8
+DELETE /api/todos/64b8fd2e9c8a2d1f0c8e91a7/tags/64b8fd2e9c8a2d1f0c8e91a8
 ```
 
 #### **Exemple de Réponse**
